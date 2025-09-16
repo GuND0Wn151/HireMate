@@ -1,14 +1,18 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-
+from app.services.db_setup import ensure_users_table
+print(ensure_users_table())
 def create_app() -> FastAPI:
 	app = FastAPI(title="JobPrep AI Backend", version="1.0.0")
 
 	# CORS for local dev; tighten in production
+	allowed_origins = os.getenv("ALLOWED_ORIGINS", "*")
+	origins = [o.strip() for o in allowed_origins.split(",") if o.strip()]
 	app.add_middleware(
 		CORSMiddleware,
-		allow_origins=["*"],
+		allow_origins=origins if origins else ["*"],
 		allow_credentials=True,
 		allow_methods=["*"],
 		allow_headers=["*"],
