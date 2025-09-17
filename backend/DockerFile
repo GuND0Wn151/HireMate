@@ -1,0 +1,15 @@
+#create docker file for postgres
+FROM postgres:latest
+COPY init.sql /docker-entrypoint-initdb.d/
+EXPOSE 5432
+ENV POSTGRES_USER=admin
+ENV POSTGRES_PASSWORD=admin
+ENV POSTGRES_DB=postgres
+ENV PGDATA=/var/lib/postgresql/data/pgdata
+VOLUME /var/lib/postgresql/data
+CMD ["postgres"]
+#docker build -t my-postgres .
+#docker run -d -p 5432:5432 --name my-postgres-container my-postgres
+#docker exec -it my-postgres-container psql -U admin -d postgres
+#docker stop my-postgres-container
+#docker start my-postgres-container
