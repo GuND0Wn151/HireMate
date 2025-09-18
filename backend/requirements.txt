@@ -13,5 +13,6 @@ email-validator==2.2.0
 supabase==2.6.0
 websockets<13
 supabase==2.6.0
-dotenv==1.0.1
-
+dotenv
+pydantic-settings
+asyncpg

@@ -1,9 +1,11 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers import auth, upload, resume, questions, practice, applications
 
-from app.services.db_setup import ensure_users_table
-print(ensure_users_table())
+# from infra.db.client import init_pool, close_pool
+# from app.services.db_setup import ensure_users_table
+# print(ensure_users_table())
 def create_app() -> FastAPI:
 	app = FastAPI(title="JobPrep AI Backend", version="1.0.0")
 
@@ -19,7 +21,6 @@ def create_app() -> FastAPI:
 	)
 
 	# Routers
-	from app.routers import auth, upload, resume, questions, practice, applications
 	app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 	app.include_router(upload.router, prefix="/api/upload", tags=["upload"])
 	app.include_router(resume.router, prefix="/api", tags=["resume"])
