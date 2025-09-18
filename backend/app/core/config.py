@@ -1,6 +1,8 @@
 #create a config to get database url from env variable use pydantic
 from pydantic import BaseModel, PostgresDsn, Field
 from pydantic_settings import BaseSettings
+from typing import Optional
+
 class Settings(BaseSettings):
       DATABASE_URL: PostgresDsn = Field(..., env="DATABASE_URL")
       DB_MIN_SIZE: int = Field(1, env="DB_MIN_SIZE")
@@ -10,6 +12,11 @@ class Settings(BaseSettings):
       Host: str = Field(..., env="host")
       Port: str = Field(..., env="port")
       Dbname: str = Field(..., env="dbname")
+      
+      # JWT Settings
+      SECRET_KEY: str = Field("your-secret-key-change-this-in-production", env="SECRET_KEY")
+      ALGORITHM: str = Field("HS256", env="ALGORITHM")
+      ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
       
       class Config:
             env_file = ".env"

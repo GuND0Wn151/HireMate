@@ -13,6 +13,10 @@ class UserRepository:
             result = await self.db.execute(select(User).where(User.email == email))
             return result.scalars().first()
 
+      async def get_user_by_id(self, user_id: int) -> Optional[User]:
+            result = await self.db.execute(select(User).where(User.id == user_id))
+            return result.scalars().first()
+
       async def create_user(self, user: User) -> User:
             self.db.add(user)
             await self.db.commit()

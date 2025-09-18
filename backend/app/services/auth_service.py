@@ -2,35 +2,78 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from app.db.repos.users import UserRepository
 from app.db.models.user import User
-from app.auth.schemas import LoginSchema, RegisterSchema, UserSchema, AdditionalInfoSchema, TokenResponse, UserResponse
+from app.schemas.auth_schemas import LoginSchema, RegisterSchema, UserSchema, AdditionalInfoSchema, TokenResponse, UserResponse
+from app.core.jwt_utils import jwt_manager
+from sqlalchemy.exc import IntegrityError
 
 class AuthService:
       def __init__(self, db: AsyncSession):
             self.user_repo = UserRepository(db)
-      
-      def hash_password(self, password: str) -> str:
-            # Implement a secure password hashing mechanism here
-            import hashlib
-            return hashlib.sha256(password.encode()).hexdigest()
 
-      async def signup(self, email: str, password: str) -> TokenResponse:
+      async def signup(self, email: str, password: str, name: str) -> TokenResponse:
+            """
+            Register a new user with email, password, and name.
+            Returns a JWT token upon successful registration.
+            """
+            # Check if user already exists
             existing_user = await self.user_repo.get_user_by_email(email)
             if existing_user:
                   raise ValueError("Email already registered")
-            hashed_password = self.hash_password(password)
-            new_user = User(email=email, hashed_password=hashed_password)
-            created_user = await self.user_repo.create_user(new_user)
-            # todo: generate JWT token
-            token = "dummy_token"  # Replace with actual token generation logic
-            return TokenResponse(
-                  access_token=token,
-                  message="User created successfully",
+            
+            # Hash the password securely
+            hashed_password = jwt_manager.get_password_hash(password)
+            
+            # Create new user
+            new_user = User(
+                  email=email, 
+                  hashed_password=hashed_password,
+                  username=name  # Store name in username field for now
             )
-      
+            
+            try:
+                  created_user = await self.user_repo.create_user(new_user)
+                  
+                  # Generate JWT token
+                  token = jwt_manager.create_user_token(created_user.id, created_user.email)
+                  
+                  return TokenResponse(
+                        access_token=token,
+                        token_type="bearer",
+                        message="User created successfully"
+                  )
+            except IntegrityError:
+                  raise ValueError("Email already registered")
 
       async def login(self, email: str, password: str) -> TokenResponse:
-            # todo: implement login logic with password verification and token generation
-            pass
+            """
+            Authenticate user with email and password.
+            Returns a JWT token upon successful authentication.
+            """
+            # Get user by email
+            user = await self.user_repo.get_user_by_email(email)
+            if not user:
+                  raise ValueError("Invalid email or password")
+            
+            # Verify password
+            if not jwt_manager.verify_password(password, user.hashed_password):
+                  raise ValueError("Invalid email or password")
+            
+            # Check if user is active
+            if not user.is_active:
+                  raise ValueError("Account is deactivated")
+            
+            # Generate JWT token
+            token = jwt_manager.create_user_token(user.id, user.email)
+            
+            return TokenResponse(
+                  access_token=token,
+                  token_type="bearer",
+                  message="Login successful"
+            )
+
+      async def get_user_by_id(self, user_id: int) -> Optional[User]:
+            """Get user by ID."""
+            return await self.user_repo.get_user_by_id(user_id)
 
 
 

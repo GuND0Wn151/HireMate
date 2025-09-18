@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, upload, resume, questions, practice, applications
+from app.routers import auth
 
 # from infra.db.client import init_pool, close_pool
 # from app.services.db_setup import ensure_users_table
@@ -22,11 +22,7 @@ def create_app() -> FastAPI:
 
 	# Routers
 	app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-	app.include_router(upload.router, prefix="/api/upload", tags=["upload"])
-	app.include_router(resume.router, prefix="/api", tags=["resume"])
-	app.include_router(questions.router, prefix="/api/questions", tags=["questions"])
-	app.include_router(practice.router, prefix="/api/practice", tags=["practice"])
-	app.include_router(applications.router, prefix="/api/applications", tags=["applications"])
+
 
 	@app.get("/health")
 	def health_check():
