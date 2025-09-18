@@ -37,3 +37,7 @@ class UserResponse(BaseModel):
       email: EmailStr
       message: Optional[str] = "User information updated successfully"\
 
+class SignupResponse(BaseModel):
+      message: Optional[str] = "User created successfully"
+      user_id: Optional[int] = None
+      email: Optional[EmailStr] = None
