@@ -10,10 +10,10 @@ class AuthService:
       def __init__(self, db: AsyncSession):
             self.user_repo = UserRepository(db)
 
-      async def signup(self, email: str, password: str, name: str) -> TokenResponse:
+      async def signup(self, email: str, password: str, name: str) -> dict:
             """
             Register a new user with email, password, and name.
-            Returns a JWT token upon successful registration.
+            Returns success message upon successful registration.
             """
             # Check if user already exists
             existing_user = await self.user_repo.get_user_by_email(email)
@@ -33,14 +33,11 @@ class AuthService:
             try:
                   created_user = await self.user_repo.create_user(new_user)
                   
-                  # Generate JWT token
-                  token = jwt_manager.create_user_token(created_user.id, created_user.email)
-                  
-                  return TokenResponse(
-                        access_token=token,
-                        token_type="bearer",
-                        message="User created successfully"
-                  )
+                  return {
+                        "message": "User created successfully",
+                        "user_id": created_user.id,
+                        "email": created_user.email
+                  }
             except IntegrityError:
                   raise ValueError("Email already registered")
 
