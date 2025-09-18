@@ -1,4 +1,4 @@
-from . import auth, upload, resume, questions, practice, applications
+from . import auth
 
 __all__ = [
 	"auth",
