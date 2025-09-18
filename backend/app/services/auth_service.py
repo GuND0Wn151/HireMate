@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from app.db.repos.users import UserRepository
 from app.db.models.user import User
-from app.schemas.auth_schemas import LoginSchema, RegisterSchema, UserSchema, AdditionalInfoSchema, TokenResponse, UserResponse
+from app.schemas.auth_schemas import LoginSchema, RegisterSchema, UserSchema, AdditionalInfoSchema, TokenResponse, UserResponse,SignupResponse
 from app.core.jwt_utils import jwt_manager
 from sqlalchemy.exc import IntegrityError
 
@@ -10,7 +10,7 @@ class AuthService:
       def __init__(self, db: AsyncSession):
             self.user_repo = UserRepository(db)
 
-      async def signup(self, email: str, password: str, name: str) -> dict:
+      async def signup(self, email: str, password: str, name: str) -> SignupResponse:
             """
             Register a new user with email, password, and name.
             Returns success message upon successful registration.
