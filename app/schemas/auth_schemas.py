@@ -32,7 +32,6 @@ class TokenResponse(BaseModel):
       token_type: str = "bearer"
       message: Optional[str] = "User created successfully"
       
-
 class UserResponse(BaseModel):
       email: EmailStr
       message: Optional[str] = "User information updated successfully"\
