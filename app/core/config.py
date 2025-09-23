@@ -18,6 +18,9 @@ class Settings(BaseSettings):
       ALGORITHM: str = Field("HS256", env="ALGORITHM")
       ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
       
+      # Firecrawl
+      FIRECRAWL_API_KEY: Optional[str] = Field(None, env="FIRECRAWL_API_KEY")
+      
       class Config:
             env_file = ".env"
             env_file_encoding = "utf-8"

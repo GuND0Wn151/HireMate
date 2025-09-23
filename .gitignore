@@ -19,7 +19,7 @@ ENV/
 
 # Environment
 .env
-.env.*
+
 
 # IDEs
 .vscode/
