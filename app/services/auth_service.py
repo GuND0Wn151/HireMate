@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from app.db.repos.users import UserRepository
 from app.db.models.user import User
-from app.schemas.auth_schemas import LoginSchema, RegisterSchema, UserSchema, AdditionalInfoSchema, TokenResponse, UserResponse,SignupResponse
+from app.schemas.auth import LoginSchema, RegisterSchema, UserSchema, AdditionalInfoSchema, TokenResponse, UserResponse,SignupResponse
 from app.core.jwt_utils import jwt_manager
 from sqlalchemy.exc import IntegrityError
 
