@@ -22,3 +22,21 @@ class RedisClient:
     def delete(self, key: str):
         """Delete a key from Redis."""
         self.client.delete(key)
+
+    def hset(self, key: str, mapping: dict):
+        """Set a field in a hash."""
+        self.client.hset(name=key, mapping=mapping)
+
+    def hget(self, name: str, key: str) -> str:
+        """Get a field from a hash."""
+        return self.client.hget(name, key)
+    
+    def hgetall(self, name: str) -> dict:
+        """Get all fields and values in a hash."""
+        return self.client.hgetall(name)
+    
+    def hdel(self, name: str, key: str):
+        """Delete a field from a hash."""
+        self.client.hdel(name, key)
+
+    
