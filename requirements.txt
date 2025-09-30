@@ -5,11 +5,8 @@ psycopg2-binary==2.9.9
 sqlalchemy==2.0.35
 httpx==0.27.2
 openai==1.52.0
-<<<<<<< Updated upstream
 python-multipart==0.0.9
 firecrawl-py==0.0.16
-=======
->>>>>>> Stashed changes
 Pillow==10.4.0
 pdfminer.six==20231228
 python-docx==1.1.2
@@ -24,3 +21,4 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.9
 bcrypt==4.0.1
 redis
+requests

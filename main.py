@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth
 from app.routers import job
+from app.routers import jobapi
 # from infra.db.client import init_pool, close_pool
 # from app.services.db_setup import ensure_users_table
 # print(ensure_users_table())
@@ -23,6 +24,7 @@ def create_app() -> FastAPI:
 	# Routers
 	app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 	app.include_router(job.router, prefix="/api/job", tags=["job"])
+	app.include_router(jobapi.router, prefix="/main", tags=["jobapi"])
 
 	@app.get("/health")
 	def health_check():

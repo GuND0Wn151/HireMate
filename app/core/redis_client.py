@@ -11,32 +11,28 @@ class RedisClient:
             decode_responses=True
         )
 
-    def set(self, key: str, value: str, ex: int = 3600):
-        """Set a value in Redis with an expiration time (default 1 hour)."""
-        self.client.set(name=key, value=value, ex=ex)
-
-    def get(self, key: str) -> str:
-        """Get a value from Redis by key."""
-        return self.client.get(name=key)
-
-    def delete(self, key: str):
-        """Delete a key from Redis."""
-        self.client.delete(key)
-
+        #set expiry to 1 month
+        self.expiry = 30 * 24 * 3600  # 30 days in seconds
+    
     def hset(self, key: str, mapping: dict):
-        """Set a field in a hash."""
-        self.client.hset(name=key, mapping=mapping)
+        self.client.hset(key, mapping=mapping)
 
-    def hget(self, name: str, key: str) -> str:
-        """Get a field from a hash."""
-        return self.client.hget(name, key)
-    
-    def hgetall(self, name: str) -> dict:
-        """Get all fields and values in a hash."""
-        return self.client.hgetall(name)
-    
-    def hdel(self, name: str, key: str):
-        """Delete a field from a hash."""
-        self.client.hdel(name, key)
+    def hget(self, key: str):
+        return self.client.hget(key)
 
-    
+    def addIndex(self, key: str):
+        self.client.sadd("jobs:indices", key)
+
+    def checkIndex(self, key: str) -> bool:
+        return self.client.sismember("jobs:indices", key)
+        
+    def isEmtpy(self, key: str) -> bool:
+        return self.client.scard(key) == 0
+        
+    def check_redis_connection(self) -> bool:
+        try:
+            print('Checking Redis connection...')
+            self.client.ping()
+            return True
+        except redis.ConnectionError:
+            return False

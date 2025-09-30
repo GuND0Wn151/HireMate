@@ -3,17 +3,17 @@ from app.api.api_client import APIClient
 from app.core.redis_client import RedisClient
 from hashlib import sha256
 
-redis_client = RedisClient()
 api_client = APIClient()
 
 class JobsAPI:
       @staticmethod
-      def get_job_details(job_id: str) -> dict:
+      def get_job_details() -> list:
             """Fetch job details from JobAPI and normalize the data."""
-            url = f"https://api.jobapi.dev/v1/jobs/{job_id}"
-            headers = {"Authorization : Bearer YOUR_API_KEY"}
-            job_data = api_client.get(url, headers=headers)
-
+            url = f"https://jobs.indianapi.in/jobs"
+            headers = {"X-Api-Key":"sk-live-ODRiyZB9h6SP9f5MXgOXbSYv6UBhjUNHhKTfD4Ji"}
+            query_params = {"limit": 100}
+            job_data = api_client.get(url, headers=headers, params=query_params)
+            
             all_jobs = []
             job_attributes = ["id", "title", "company", "location", "posted_date", "job_description", "apply_link", "job_title"]
             for i in job_data:
@@ -31,7 +31,8 @@ class JobsAPI:
                               else:
                                     job[attr] = i[attr]
                   all_jobs.append(job)
-            
+                  job['fingertprint'] = JobsAPI.fingerprint_job(job)
+
             return all_jobs
 
       @staticmethod
@@ -40,12 +41,8 @@ class JobsAPI:
             fp_payload = {
                   "title": job.get("job_title") or job.get("title"),
                   "company": job.get("company"),
-                  "location": job.get("location"),
-                  "job_description": job.get("job_description"),
                   "apply_link": job.get("apply_link"),
                   "date_posted": job.get("posted_date"),
             }
 
             return HashUtils.fingerprint(fp_payload)
-
-
