@@ -6,13 +6,6 @@ from app.core.fire_crawl import _get_firecrawl_client, fetch_markdown, extract_j
 
 router = APIRouter()
 
-
-
-
-
-
-
-
 @router.post("/extract-job", response_model=ExtractResponse)
 async def extract_job_description(payload: ExtractRequest):
       client = _get_firecrawl_client()

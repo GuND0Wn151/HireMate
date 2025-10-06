@@ -13,7 +13,6 @@ class JobsService:
       def get_jobs(self) -> list:
             """Fetch jobs from JobAPI and store them in Redis."""
             # Check if jobs are already indexed
-            print('in getjobs')
             print(self.redis_client.isEmtpy("jobs:indices"),' is empty')
             if self.redis_client.isEmtpy("jobs:indices"):
                   self._add_all_from_api()
