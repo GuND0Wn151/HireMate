@@ -7,7 +7,7 @@ start-env:
 	.venv\Scripts\activate
 
 run:
-	uvicorn main:app --reload --port 8080
+	uvicorn main:app --reload --port 1234
 
 init-db:
 	python  -m app.db.init_db

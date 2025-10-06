@@ -1,24 +1,70 @@
-# dependency injection for FastAPI (get_db, get_redis, get_pinecone_client)
+# app/core/deps.py
+from __future__ import annotations
 
-# get_db should return a session from sqlalchemy.orm.sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from typing import AsyncGenerator
-from .config import settings
-from sqlalchemy.exc import SQLAlchemyError
+from functools import lru_cache
+from typing import AsyncGenerator, Optional
+
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 
-print("Creating async DB engine with settings:", settings.DATABASE_URL)
-engine = create_async_engine(str(settings.DATABASE_URL), pool_size=settings.DB_MAX_SIZE, max_overflow=0)
-SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+from app.core.config import settings
+from app.core.redis_client import RedisClient
+from app.api.api_client import APIClient
+from app.api.jobs_api import JobsAPI
+from app.services.jobs_service import JobsService
+
+# --- SQLAlchemy (Async) -------------------------------------------------------
+
+engine = create_async_engine(
+    str(settings.DATABASE_URL),
+    pool_size=getattr(settings, "DB_MAX_SIZE", 5),
+    max_overflow=0,
+    echo=getattr(settings, "DB_ECHO", False),
+    future=True,
+)
+
+AsyncSessionLocal = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-      async with SessionLocal() as session:
-            try:
-                  yield session
-            except SQLAlchemyError as e:
-                  print(f"Database error: {e}")
-                  raise
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        except SQLAlchemyError:
+            raise
 
-def get_deps():
-      return get_db
+
+# --- Redis -------------------------------------------------------------------
+
+@lru_cache
+def get_redis() -> RedisClient:
+    """
+    Return a singleton RedisClient wrapper.
+    """
+    return RedisClient()
+
+# --- JobsService -------------------------------------------------------------
+
+@lru_cache
+def get_api_client() -> APIClient:
+    return APIClient()
+
+@lru_cache
+def get_jobs_api() -> JobsAPI:
+    return JobsAPI()
+
+def get_jobs_service(
+    redis: RedisClient = Depends(get_redis),
+    api_client: APIClient = Depends(get_api_client),
+    jobs_api: JobsAPI = Depends(get_jobs_api),
+) -> JobsService:
+    """
+    Dependency for JobsService.
+    Ensures that RedisClient, APIClient, and JobsAPI are injected properly.
+    """
+    return JobsService(redis_client=redis, api_client=api_client, jobs_api=jobs_api)

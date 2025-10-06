@@ -12,6 +12,9 @@ class Settings(BaseSettings):
       Host: str = Field(..., env="host")
       Port: str = Field(..., env="port")
       Dbname: str = Field(..., env="dbname")
+      REDIS_HOST: str = Field("localhost", env="REDIS_HOST")
+      REDIS_PORT: int = Field(6379, env="REDIS_PORT")
+
       
       # JWT Settings
       SECRET_KEY: str = Field("your-secret-key-change-this-in-production", env="SECRET_KEY")

@@ -7,13 +7,6 @@ from app.core.s3_utils import s3_service
 
 router = APIRouter()
 
-
-
-
-
-
-
-
 @router.post("/extract-job", response_model=ExtractResponse)
 async def extract_job_description(payload: ExtractRequest):
       client = _get_firecrawl_client()

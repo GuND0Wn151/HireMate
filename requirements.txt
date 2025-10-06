@@ -13,11 +13,13 @@ python-docx==1.1.2
 email-validator==2.2.0
 supabase==2.6.0
 websockets<13
-supabase==2.6.0
 dotenv
 pydantic-settings
 asyncpg
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.9
+bcrypt==4.0.1
+redis
+requests
 boto3==1.35.0
