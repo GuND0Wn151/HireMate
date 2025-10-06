@@ -24,6 +24,12 @@ class Settings(BaseSettings):
       # Firecrawl
       FIRECRAWL_API_KEY: Optional[str] = Field(None, env="FIRECRAWL_API_KEY")
       
+      # AWS S3 Settings
+      AWS_ACCESS_KEY_ID: str = Field(..., env="AWS_ACCESS_KEY_ID")
+      AWS_SECRET_ACCESS_KEY: str = Field(..., env="AWS_SECRET_ACCESS_KEY")
+      AWS_REGION: str = Field("ap-south-1", env="AWS_REGION")
+      S3_BUCKET_NAME: str = Field(..., env="S3_BUCKET_NAME")
+      
       class Config:
             env_file = ".env"
             env_file_encoding = "utf-8"
