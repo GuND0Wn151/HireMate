@@ -86,12 +86,8 @@ class S3Service:
                 }
             )
             
-            # Generate pre-signed URL for secure access (expires in 7 days)
-            file_url = self.s3_client.generate_presigned_url(
-                'get_object',
-                Params={'Bucket': self.bucket_name, 'Key': s3_key},
-                ExpiresIn=604800  # 7 days in seconds
-            )
+            # Generate clean S3 URL without query parameters
+            file_url = f"https://{self.bucket_name}.s3.{settings.AWS_REGION}.amazonaws.com/{s3_key}"
             
             return {
                 "file_url": file_url,
