@@ -2,14 +2,17 @@ from fastapi import APIRouter, HTTPException, File, Form, UploadFile
 from typing import Optional
 from app.core.config import settings
 from app.schemas.job import ExtractRequest, ExtractResponse, PDFUploadResponse
-from app.core.fire_crawl import _get_firecrawl_client, fetch_markdown, extract_job_description_from_markdown
+from app.core.fire_crawl import fetch_markdown, extract_job_description_from_markdown
 from app.core.s3_utils import s3_service
+from langchain_openai import ChatOpenAI
+from langchain.schema import HumanMessage
+import os
+from app.services.job_api import JobAPI
 
 router = APIRouter()
 
 @router.post("/extract-job", response_model=ExtractResponse)
 async def extract_job_description(payload: ExtractRequest):
-      client = _get_firecrawl_client()
       try:
             # Scrape content as markdown for maximum extraction reliability
             markdown_content: Optional[str] = None
@@ -18,45 +21,54 @@ async def extract_job_description(payload: ExtractRequest):
             except Exception:
                   markdown_content = None
 
-            job_description = None
+            if not markdown_content:
+                  raise HTTPException(status_code=502, detail="Failed to retrieve page content")
 
-            # Try Firecrawl extract with a focused prompt
+            # Use LangChain with OpenAI to extract and summarize job description
             try:
-                  extract_result = client.extract(
-                        [str(payload.url)],
-                        prompt=(
-                              "Extract ONLY the job description text from this page. "
-                              "Do not include company boilerplate, application instructions, or unrelated sections. "
-                              "Return plain text."
-                        ),
+                  # Initialize OpenAI chat model with stricter parameters
+                  llm = ChatOpenAI(
+                        openai_api_key=settings.OPENAI_API_KEY,
+                        model_name="gpt-4o-mini",  # Use more capable model
+                        temperature=0.0,  # More deterministic
+                        max_tokens=300  # Limit response length
                   )
-                  if getattr(extract_result, "success", False):
-                        # Some SDKs return a list of dicts in data; fall back to markdown if missing
-                        data = getattr(extract_result, "data", None)
-                        if isinstance(data, list) and data:
-                              first = data[0]
-                              if isinstance(first, dict):
-                                    # Prefer 'job_description' key if present; else join values
-                                    job_description = (
-                                          first.get("job_description")
-                                          or first.get("content")
-                                          or None
-                                    )
-            except Exception:
-                  # Ignore extract errors; we'll fall back to markdown
-                  pass
-
-            if not job_description:
-                  # Fallback: use markdown content, then post-process to isolate JD
-                  if not markdown_content:
-                        raise HTTPException(status_code=502, detail="Failed to retrieve page content")
+                  
+                  # Create prompt for job description extraction and summarization
+                  prompt = f"""
+                  Extract and summarize the job description from the following job posting. 
+                  
+                  CRITICAL REQUIREMENTS:
+                  - Summarize to EXACTLY 5-6 bullet points maximum
+                  - Each bullet point should be concise (1-2 lines max)
+                  - Focus ONLY on core responsibilities, required skills, and key requirements
+                  - Remove ALL company boilerplate, benefits, application instructions, and unrelated content
+                  - Use bullet point format (• or -)
+                  
+                  Job posting content:
+                  {markdown_content}
+                  
+                  Return ONLY the 5-6 bullet point summary, nothing else.
+                  """
+                  
+                  # Generate job description using LangChain
+                  messages = [HumanMessage(content=prompt)]
+                  response = llm.invoke(messages)
+                  raw_response = response.content.strip()
+                  
+                  # Post-process to ensure we get exactly what we want
+                  job_description = JobAPI._post_process_job_description(raw_response)
+                  
+            except Exception as e:
+                  # Fallback to original markdown processing if LangChain fails
                   job_description = extract_job_description_from_markdown(markdown_content)
 
-            return ExtractResponse(job_description=job_description.strip(), source_url=payload.url)
+            return ExtractResponse(job_description=job_description, source_url=payload.url)
+            
       except HTTPException:
             raise
       except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Firecrawl error: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Job extraction error: {str(e)}")
 
 
 @router.post("/upload-pdf", response_model=PDFUploadResponse)
