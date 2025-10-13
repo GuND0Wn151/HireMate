@@ -24,6 +24,9 @@ class Settings(BaseSettings):
       # Firecrawl
       FIRECRAWL_API_KEY: Optional[str] = Field(None, env="FIRECRAWL_API_KEY")
       
+      # OpenAI
+      OPENAI_API_KEY: str = Field(..., env="OPENAI_API_KEY")
+      
       # AWS S3 Settings
       AWS_ACCESS_KEY_ID: str = Field(..., env="AWS_ACCESS_KEY_ID")
       AWS_SECRET_ACCESS_KEY: str = Field(..., env="AWS_SECRET_ACCESS_KEY")
