@@ -29,26 +29,41 @@ async def extract_job_description(payload: ExtractRequest):
                   # Initialize OpenAI chat model with stricter parameters
                   llm = ChatOpenAI(
                         openai_api_key=settings.OPENAI_API_KEY,
-                        model_name="gpt-4o-mini",  # Use more capable model
-                        temperature=0.0,  # More deterministic
-                        max_tokens=300  # Limit response length
+                        model_name="gpt-5-nano",  # Use reliable model
+                        temperature=0.1,  # Slightly more creative for better extraction
+                        max_tokens=800  # Allow more comprehensive response
                   )
                   
                   # Create prompt for job description extraction and summarization
                   prompt = f"""
-                  Extract and summarize the job description from the following job posting. 
+                  Extract ONLY the job description from the following job posting and format it as bullet points.
                   
-                  CRITICAL REQUIREMENTS:
-                  - Summarize to EXACTLY 5-6 bullet points maximum
-                  - Each bullet point should be concise (1-2 lines max)
-                  - Focus ONLY on core responsibilities, required skills, and key requirements
-                  - Remove ALL company boilerplate, benefits, application instructions, and unrelated content
+                  EXTRACT ONLY:
+                  - Job title and role
+                  - Key responsibilities and duties
+                  - Required qualifications and experience
+                  - Required skills and technologies
+                  - Preferred qualifications (if any)
+                  
+                  IGNORE COMPLETELY:
+                  - Browser compatibility messages
+                  - Company descriptions and boilerplate
+                  - Benefits and perks information
+                  - Application instructions
+                  - Location details beyond what's essential
+                  - Navigation elements or UI text
+                  - Any text starting with "Sorry" or browser-related content
+                  - Google Maps or cookie-related text
+                  
+                  FORMAT:
                   - Use bullet point format (• or -)
+                  - Keep each bullet point concise but clear
+                  - Focus on job-specific information only
                   
                   Job posting content:
                   {markdown_content}
                   
-                  Return ONLY the 5-6 bullet point summary, nothing else.
+                  Return ONLY the clean job description in bullet points, nothing else.
                   """
                   
                   # Generate job description using LangChain
