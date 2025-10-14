@@ -1,6 +1,7 @@
 from app.core.redis_client import RedisClient
 from app.api.api_client import APIClient
 from app.api.jobs_api import JobsAPI
+from app.schemas.job import ListJobsResponse
 
 class JobsService:
       def __init__(self, redis_client: RedisClient = None, api_client: APIClient = None, jobs_api: JobsAPI = None):
@@ -10,7 +11,7 @@ class JobsService:
             self.redis_client.check_redis_connection()
 
 
-      def get_jobs(self) -> list:
+      def get_jobs(self) -> ListJobsResponse:
             """Fetch jobs from JobAPI and store them in Redis."""
             # Check if jobs are already indexed
             print(self.redis_client.isEmtpy("jobs:indices"),' is empty')
@@ -23,8 +24,8 @@ class JobsService:
                   job_data = self.redis_client.client.hgetall(f"jobs:job:{index}")
                   if job_data:
                         all_jobs.append(job_data)
-            
-            return all_jobs
+        
+            return ListJobsResponse(count=len(all_jobs), jobsList=all_jobs)
       
       def _upsert_job(self, job: dict):
             """Insert or update a job in Redis."""

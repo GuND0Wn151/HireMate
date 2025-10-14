@@ -2,12 +2,16 @@ from fastapi import APIRouter, HTTPException, File, Form, UploadFile
 from typing import Optional
 from app.core.config import settings
 from app.schemas.job import ExtractRequest, ExtractResponse, PDFUploadResponse
-from app.core.fire_crawl import fetch_markdown, extract_job_description_from_markdown
+from app.core.fire_crawl import fetch_markdown
 from app.core.s3_utils import s3_service
 from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage
 import os
 from app.services.job_api import JobAPI
+from app.core.consts import Consts
+
+
+
 
 router = APIRouter()
 
