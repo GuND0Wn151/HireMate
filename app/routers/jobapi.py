@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.schemas.job import ExtractRequest, ExtractResponse, PDFUploadResponse
 from app.core.fire_crawl import _get_firecrawl_client, fetch_markdown
 from app.core.s3_utils import s3_service
-from app.services.fircrawl import FirecrawlService
+from app.services.firecrawl import FirecrawlService
 
 router = APIRouter()
 
