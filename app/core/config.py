@@ -32,7 +32,7 @@ class Settings(BaseSettings):
       AWS_SECRET_ACCESS_KEY: str = Field(..., env="AWS_SECRET_ACCESS_KEY")
       AWS_REGION: str = Field("ap-south-1", env="AWS_REGION")
       S3_BUCKET_NAME: str = Field(..., env="S3_BUCKET_NAME")
-      
+
       class Config:
             env_file = ".env"
             env_file_encoding = "utf-8"

@@ -20,16 +20,16 @@ class JobsAPI:
                   job = {}
                   for attr in job_attributes:
                         if attr in i:
-                              if attr in ["title", "company", "job_description", "job_title"]:
-                                    job[attr] = DeNormalizer.denorm_text(i[attr])
-                              elif attr == "location":
-                                    job[attr] = DeNormalizer.denorm_location(i[attr])
-                              elif attr == "posted_date":
-                                    job[attr] = DeNormalizer.denorm_date(i[attr])
-                              elif attr == "apply_link":
-                                    job[attr] = DeNormalizer.denorm_url(i[attr])
-                              else:
-                                    job[attr] = i[attr]
+                            if attr in ["title", "company", "job_description", "job_title"]:
+                                job[attr] = DeNormalizer.denorm_text(i[attr])
+                            elif attr == "location":
+                                job[attr] = DeNormalizer.denorm_location(i[attr])
+                            elif attr == "posted_date":
+                                job[attr] = DeNormalizer.denorm_date(i[attr])
+                            elif attr == "apply_link":
+                                job[attr] = DeNormalizer.denorm_url(i[attr])
+                            else:
+                                job[attr] = i[attr]
                   all_jobs.append(job)
                   job['fingertprint'] = JobsAPI.fingerprint_job(job)
 

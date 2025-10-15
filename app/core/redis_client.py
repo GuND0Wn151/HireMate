@@ -19,11 +19,15 @@ class RedisClient:
 
     def hget(self, key: str):
         return self.client.hget(key)
+    
+    def hgetAll(self, key: str):
+        return self.client.hgetall(key)
 
+    # make this generic and remove the hardcoded strings
     def addIndex(self, key: str):
         self.client.sadd("jobs:indices", key)
 
-    def checkIndex(self, key: str) -> bool:
+    def checkIndex(self, key: str) -> bool: 
         return self.client.sismember("jobs:indices", key)
         
     def isEmtpy(self, key: str) -> bool:
@@ -36,3 +40,9 @@ class RedisClient:
             return True
         except redis.ConnectionError:
             return False
+
+    def addIndexExtract(self, key: str):
+        self.client.sadd("jobs:details", key)
+    
+    def checkJobData(self, key: str):
+        return self.client.sismember("jobs:details", key)

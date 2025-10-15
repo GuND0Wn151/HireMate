@@ -14,6 +14,7 @@ from app.core.redis_client import RedisClient
 from app.api.api_client import APIClient
 from app.api.jobs_api import JobsAPI
 from app.services.jobs_service import JobsService
+from app.services.firecrawl import FirecrawlService
 
 # --- SQLAlchemy (Async) -------------------------------------------------------
 
@@ -57,6 +58,9 @@ def get_api_client() -> APIClient:
 @lru_cache
 def get_jobs_api() -> JobsAPI:
     return JobsAPI()
+
+def get_firecrawl_service() -> FirecrawlService:
+    return FirecrawlService(get_redis())
 
 def get_jobs_service(
     redis: RedisClient = Depends(get_redis),
