@@ -41,7 +41,7 @@ class FirecrawlService:
         print('before gemini')
 
         # ensure configured earlier or do it here:
-        client = genai.Client(api_key='')
+        client = genai.Client(api_key=' ')
         print('after making client')
 
         prompt = prompts.extract_job_v2(markdown_content)
